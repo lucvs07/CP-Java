@@ -29,23 +29,27 @@ public class Ache {
 
 	// Função imprimirDados() que imprime os dados dos vetores
 	public static void imprimirDados(int[] codigos, String[] fabricas, int[] prodMaxima, int[] prodMes1, int[] prodMes2, int[] prodMes3, double[] producaoMedia, double[] porcentagemNaoProducao){
-		System.out.println("Codigo\tFabrica\t\tProd. Maxima\tProd. Mes 1\tProd. Mes 2\tProd. Mes 3\tMedia Producao\t% Nao Producao");
+		System.out.printf("%-8s %-20s %-15s %-12s %-12s %-12s %-15s %-15s\n", 
+        "Codigo", "Fabrica", "Prod. Maxima", "Prod. Mes 1", "Prod. Mes 2", "Prod. Mes 3", "Media Producao", "% Nao Producao");
 		System.out.println("-------------------------------------------------------------------------------------------------------------------------------------------------");
 		for (int j = 0; j < N; j++) {
-			System.out.printf("%d\t%s\t%d\t\t%d\t\t%d\t\t%d\t\t%.2f\t%.2f\n", codigos[j], fabricas[j], prodMaxima[j], prodMes1[j], prodMes2[j], prodMes3[j], producaoMedia[j], porcentagemNaoProducao[j]);
+			System.out.printf("%-8d %-20s %-15d %-12d %-12d %-12d %-15.2f %-15.2f\n", 
+            codigos[j], fabricas[j], prodMaxima[j], prodMes1[j], prodMes2[j], prodMes3[j], producaoMedia[j], porcentagemNaoProducao[j]);
 		}
 		System.out.println("-------------------------------------------------------------------------------------------------------------------------------------------------");
 	}
 
 	// Funçào imprimirCabecalho() que imprime o cabecalho da tabela
 	public static void imprimirCabecalho() {
-		System.out.println("Codigo\tFabrica\t\tProd. Maxima\tProd. Mes 1\tProd. Mes 2\tProd. Mes 3\tMedia Producao\t% Nao Producao");
+		System.out.printf("%-8s %-20s %-15s %-12s %-12s %-12s %-15s %-15s\n", 
+        "Codigo", "Fabrica", "Prod. Maxima", "Prod. Mes 1", "Prod. Mes 2", "Prod. Mes 3", "Media Producao", "% Nao Producao");
 		System.out.println("-------------------------------------------------------------------------------------------------------------------------------------------------");
 	}
 
 	// Função para imprimir os dados de uma fabrica especifica
 	public static void imprimirDadosUnico(int pos ,int[] codigos, String[] fabricas, int[] prodMaxima, int[] prodMes1, int[] prodMes2, int[] prodMes3, double[] producaoMedia, double[] porcentagemNaoProducao){
-		System.out.printf("%d\t%s\t%d\t\t%d\t\t%d\t\t%d\t\t%.2f\t%.2f\n", codigos[pos], fabricas[pos], prodMaxima[pos], prodMes1[pos], prodMes2[pos], prodMes3[pos], producaoMedia[pos], porcentagemNaoProducao[pos]);
+		System.out.printf("%-8d %-20s %-15d %-12d %-12d %-12d %-15.2f %-15.2f\n", 
+        codigos[pos], fabricas[pos], prodMaxima[pos], prodMes1[pos], prodMes2[pos], prodMes3[pos], producaoMedia[pos], porcentagemNaoProducao[pos]);
 	}
 
 	// Função fabricaMaiorProducao() que procura a fabrica com maior capacidade de producao de um produto
@@ -67,11 +71,10 @@ public class Ache {
 		int[] indices = new int[1];
 		int cont = 0;
 		for (int i = 0; i < N; i++) {
-			if (fabricas[i].equalsIgnoreCase(fabInput)) {
+			if (fabricas[i].trim().equalsIgnoreCase(fabInput.trim())) {
 				// Verifica se o vetor precisa ser expandido
 				if (cont == indices.length) {
-					// Cria um novo vetor com o dobro do tamanho atual
-					int[] novoIndices = new int[indices.length * 2];
+					int[] novoIndices = new int[indices.length + 1];
 					System.arraycopy(indices, 0, novoIndices, 0, indices.length);
 					indices = novoIndices;
 				}
@@ -90,7 +93,7 @@ public class Ache {
 				// Verifica se o vetor precisa ser expandido
 				if (cont == indices.length) {
 					// Cria um novo vetor com o dobro do tamanho atual
-					int[] novoIndices = new int[indices.length * 2];
+					int[] novoIndices = new int[indices.length + 1];
 					System.arraycopy(indices, 0, novoIndices, 0, indices.length);
 					indices = novoIndices;
 				}
@@ -183,6 +186,7 @@ public class Ache {
 					if (pos != -1) {
 						System.out.println("Fabrica com maior capacidade de producao do produto " + codProcurado + ": ");
 						// Chama a funcao que imprime os dados da fabrica
+						imprimirCabecalho();
 						imprimirDadosUnico(pos, codigos, fabricas, prodMaxima, prodMes1, prodMes2, prodMes3, producaoMedia, porcentagemNaoProducao);
 					} else {
 						System.out.println("Produto nao encontrado.");
@@ -190,7 +194,9 @@ public class Ache {
 					break;
 				case 2:
 					System.out.print("Fabrica para pesquisar produtos:");
+					// Le a fabrica a ser pesquisada
 					String fab = le.nextLine();
+					System.out.println(fab);
 					/*
 					 * Implementacao item 4
 					 */
