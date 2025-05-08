@@ -125,26 +125,26 @@ public class Ache {
 			// Cria um objeto File com o caminho do arquivo
 			File arquivo = new File(caminhoDoArquivo);
 
-			// Cria um objeto da classe Scanner para ler o arquivo
-			Scanner leArq = new Scanner(arquivo);
-			int i = 0;
-			while (leArq.hasNextLine() && i < N) {
-				// Le uma linha do arquivo
-				String linha = leArq.nextLine();
-				//separa em Strings cada parte separada por ";"
-				String[] partes = linha.split(";");
-				// atribui a cada vetor declarado anteriormente as partes separadas 
-				// fazendo conversao de String para int quando necessario
-				codigos[i] = Integer.parseInt(partes[0]);
-				fabricas[i] = partes[1];
-				prodMaxima[i] = Integer.parseInt(partes[2]);
-				prodMes1[i] = Integer.parseInt(partes[3]);
-				prodMes2[i] = Integer.parseInt(partes[4]);
-				prodMes3[i] = Integer.parseInt(partes[5]);
-				i++;
-			}
-			// Fechar o objeto da classe Scanner le
-			leArq.close();
+                    try ( // Cria um objeto da classe Scanner para ler o arquivo
+                            Scanner leArq = new Scanner(arquivo)) {
+                        int i = 0;
+                        while (leArq.hasNextLine() && i < N) {
+                            // Le uma linha do arquivo
+                            String linha = leArq.nextLine();
+                            //separa em Strings cada parte separada por ";"
+                            String[] partes = linha.split(";");
+                            // atribui a cada vetor declarado anteriormente as partes separadas
+                            // fazendo conversao de String para int quando necessario
+                            codigos[i] = Integer.parseInt(partes[0]);
+                            fabricas[i] = partes[1];
+                            prodMaxima[i] = Integer.parseInt(partes[2]);
+                            prodMes1[i] = Integer.parseInt(partes[3]);
+                            prodMes2[i] = Integer.parseInt(partes[4]);
+                            prodMes3[i] = Integer.parseInt(partes[5]);
+                            i++;
+                        }
+                        // Fechar o objeto da classe Scanner le
+                    }
 		} catch (FileNotFoundException e) {
 			// Caso o arquivo n�o seja encontrado
 			System.out.println("Arquivo nao encontrado: " + e.getMessage());
@@ -164,7 +164,7 @@ public class Ache {
 
 			
 			
-			int opcao = 0;
+			int opcao;
 			
 			do {
 				System.out.println("0 - Encerrar");
@@ -175,69 +175,66 @@ public class Ache {
 				opcao = le.nextInt();
 				le.nextLine();
 				switch (opcao) {
-				case 0:
-					System.out.println("Encerrado o programa.");
-					break;
-				case 1:
-					System.out.print("Qual o codigo do produto a ser pesquisado? ");
-					int codProcurado = le.nextInt();
-					// Chama a funcao que procura a fabrica com maior capacidade de producao de um produto
-					int pos = fabricaMaiorProducao(codProcurado, codigos, fabricas, prodMaxima, prodMes1, prodMes2, prodMes3, producaoMedia, porcentagemNaoProducao);
-					if (pos != -1) {
-						System.out.println("Fabrica com maior capacidade de producao do produto " + codProcurado + ": ");
-						// Chama a funcao que imprime os dados da fabrica
-						imprimirCabecalho();
-						imprimirDadosUnico(pos, codigos, fabricas, prodMaxima, prodMes1, prodMes2, prodMes3, producaoMedia, porcentagemNaoProducao);
-					} else {
-						System.out.println("Produto nao encontrado.");
-					}
-					break;
-				case 2:
-					System.out.print("Fabrica para pesquisar produtos:");
-					// Le a fabrica a ser pesquisada
-					String fab = le.nextLine();
-					System.out.println(fab);
-					/*
-					 * Implementacao item 4
-					 */
-					// Chama a funcao que busca os produtos fabricados em uma especifica unidade
-					int[] indices = buscaPorFabrica(fab, fabricas);
-					int numeroDeElementos = indices.length;
-					if (numeroDeElementos > 0) {
-						System.out.println("Produtos fabricados na unidade " + fab + ": ");
-						// Chama a funcao que imprime os dados da fabrica
-						imprimirCabecalho();
-						for (int j = 0; j < numeroDeElementos; j++) {
-							imprimirDadosUnico(indices[j], codigos, fabricas, prodMaxima, prodMes1, prodMes2, prodMes3, producaoMedia, porcentagemNaoProducao);
-						}
-						System.out.println("-------------------------------------------------------------------------------------------------------------------------------------------------");
-					} else {
-						System.out.println("Fabrica nao encontrada.");
-					}
-					break;
-				case 3:
-					System.out.print("Qual o valor limite de percentual nao produzido que se deseja pesquisar: ");
-					double porcLimite = le.nextDouble();
-					/*
-					 * Implementacao item 5
-					 */
-					// Chama a funcao que retorna os indices dos produtos com percentual de nao producao acima de um limite
-					int[] indicesProdAbaixo = selecionaProdAbaixo(porcLimite, porcentagemNaoProducao);
-					int numeroDeElementosProdAbaixo = indicesProdAbaixo.length;
-					if (numeroDeElementosProdAbaixo > 0) {
-						System.out.println("Produtos com percentual de nao producao acima de " + porcLimite + "% 2: ");
-						// Chama a funcao que imprime os dados da fabrica
-						imprimirCabecalho();
-						for (int j = 0; j < numeroDeElementosProdAbaixo; j++) {
-							imprimirDadosUnico(indicesProdAbaixo[j], codigos, fabricas, prodMaxima, prodMes1, prodMes2, prodMes3, producaoMedia, porcentagemNaoProducao);
-						}
-						System.out.println("-------------------------------------------------------------------------------------------------------------------------------------------------");
-					} else {
-						System.out.println("Nenhum produto encontrado com percentual de nao producao acima de " + porcLimite + ".");
-					}
-					break;
-				default:
-					System.out.println("Opcao invalida");
+				case 0 -> System.out.println("Encerrado o programa.");
+				case 1 -> {
+                                    System.out.print("Qual o codigo do produto a ser pesquisado? ");
+                                    int codProcurado = le.nextInt();
+                                    // Chama a funcao que procura a fabrica com maior capacidade de producao de um produto
+                                    int pos = fabricaMaiorProducao(codProcurado, codigos, fabricas, prodMaxima, prodMes1, prodMes2, prodMes3, producaoMedia, porcentagemNaoProducao);
+                                    if (pos != -1) {
+                                        System.out.println("Fabrica com maior capacidade de producao do produto " + codProcurado + ": ");
+                                        // Chama a funcao que imprime os dados da fabrica
+                                        imprimirCabecalho();
+                                        imprimirDadosUnico(pos, codigos, fabricas, prodMaxima, prodMes1, prodMes2, prodMes3, producaoMedia, porcentagemNaoProducao);
+                                    } else {
+                                        System.out.println("Produto nao encontrado.");
+                                    }
+                                }
+				case 2 -> {
+                                    System.out.print("Fabrica para pesquisar produtos:");
+                                    // Le a fabrica a ser pesquisada
+                                    String fab = le.nextLine();
+                                    System.out.println(fab);
+                                    /*
+                                    * Implementacao item 4
+                                    */
+                                    // Chama a funcao que busca os produtos fabricados em uma especifica unidade
+                                    int[] indices = buscaPorFabrica(fab, fabricas);
+                                    int numeroDeElementos = indices.length;
+                                    if (numeroDeElementos > 0) {
+                                        System.out.println("Produtos fabricados na unidade " + fab + ": ");
+                                        // Chama a funcao que imprime os dados da fabrica
+                                        imprimirCabecalho();
+                                        for (int j = 0; j < numeroDeElementos; j++) {
+                                            imprimirDadosUnico(indices[j], codigos, fabricas, prodMaxima, prodMes1, prodMes2, prodMes3, producaoMedia, porcentagemNaoProducao);
+                                        }
+                                        System.out.println("-------------------------------------------------------------------------------------------------------------------------------------------------");
+                                    } else {
+                                        System.out.println("Fabrica nao encontrada.");
+                                    }
+                                }
+				case 3 -> {
+                                    System.out.print("Qual o valor limite de percentual nao produzido que se deseja pesquisar: ");
+                                    double porcLimite = le.nextDouble();
+                                    /*
+                                    * Implementacao item 5
+                                    */
+                                    // Chama a funcao que retorna os indices dos produtos com percentual de nao producao acima de um limite
+                                    int[] indicesProdAbaixo = selecionaProdAbaixo(porcLimite, porcentagemNaoProducao);
+                                    int numeroDeElementosProdAbaixo = indicesProdAbaixo.length;
+                                    if (numeroDeElementosProdAbaixo > 0) {
+                                        System.out.println("Produtos com percentual de nao producao acima de " + porcLimite + "% 2: ");
+                                        // Chama a funcao que imprime os dados da fabrica
+                                        imprimirCabecalho();
+                                        for (int j = 0; j < numeroDeElementosProdAbaixo; j++) {
+                                            imprimirDadosUnico(indicesProdAbaixo[j], codigos, fabricas, prodMaxima, prodMes1, prodMes2, prodMes3, producaoMedia, porcentagemNaoProducao);
+                                        }
+                                        System.out.println("-------------------------------------------------------------------------------------------------------------------------------------------------");
+                                    } else {
+                                        System.out.println("Nenhum produto encontrado com percentual de nao producao acima de " + porcLimite + ".");
+                                    }
+                                }
+				default -> System.out.println("Opcao invalida");
 				}
 			} while (opcao != 0);
 		}
