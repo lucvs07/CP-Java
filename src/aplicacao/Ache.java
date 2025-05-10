@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
+
 public class Ache {
 	/*
 	 * 
@@ -15,51 +16,42 @@ public class Ache {
 	 * Ronaldo Veloso Filho - 556445
 	 * 
 	 */
+
+	public static class Produto {
+		// Definindo atributos da classe Produto
+		String nome;
+		int codigo, producaoMax, producaoMes1, producaoMes2, producaoMes3;
+		double producaoMedia, porcentagemNaoProducao;
+
+		// Método para formartar a impressão dos dados
+		public String formatarLinha(){
+			return String.format("%-8d %-20s %-15d %-12d %-12d %-12d %-15.2f %-15.2f\n",
+			codigo, nome, producaoMax, producaoMes1, producaoMes2, producaoMes3, producaoMedia, porcentagemNaoProducao);
+		}
+		
+		public double calcularMedia(int producaoMes1, int producaoMes2, int producaoMes3){
+			return (producaoMes1 + producaoMes2 + producaoMes3) / 3.0;
+		}
+		public double calcularPorcentagemNaoProducao(double producaoMedia, int producaoMax){
+			return ((producaoMax - producaoMedia) / producaoMax) * 100;
+		}
+	}
+	
 	public static final int N = 30;
 
-	// Função calculaMediaPorcentagemProducao() que calcula a media de producao e o percentual de nao producao
-	public static void calculaMediaPorcentagemProducao(int[] prodMes1, int[] prodMes2, int[] prodMes3, int[] prodMaxima, double[] producaoMedia, double[] porcentagemNaoProducao) {
-		for (int i = 0; i < N; i++) {
-			// Calcula a media de producao
-			producaoMedia[i] = (prodMes1[i] + prodMes2[i] + prodMes3[i]) / 3.0;
-			// Calcula o percentual de nao producao
-			porcentagemNaoProducao[i] = ((prodMaxima[i] - producaoMedia[i]) / prodMaxima[i]) * 100;
-		}
+	// Método para Imprimir o Cabeçalho 
+	public static String imprimirCabecalho(){
+		return String.format("\n%-8s %-20s %-15s %-12s %-12s %-12s %-15s %-15s\n",
+		"Codigo", "Fabrica", "Prod. Maxima", "Prod. Mes 1", "Prod. Mes 2", "Prod. Mes 3", "Media Producao", "% Nao Producao");
 	}
-
-	// Função imprimirDados() que imprime os dados dos vetores
-	public static void imprimirDados(int[] codigos, String[] fabricas, int[] prodMaxima, int[] prodMes1, int[] prodMes2, int[] prodMes3, double[] producaoMedia, double[] porcentagemNaoProducao){
-		System.out.printf("%-8s %-20s %-15s %-12s %-12s %-12s %-15s %-15s\n", 
-        "Codigo", "Fabrica", "Prod. Maxima", "Prod. Mes 1", "Prod. Mes 2", "Prod. Mes 3", "Media Producao", "% Nao Producao");
-		System.out.println("-------------------------------------------------------------------------------------------------------------------------------------------------");
-		for (int j = 0; j < N; j++) {
-			System.out.printf("%-8d %-20s %-15d %-12d %-12d %-12d %-15.2f %-15.2f\n", 
-            codigos[j], fabricas[j], prodMaxima[j], prodMes1[j], prodMes2[j], prodMes3[j], producaoMedia[j], porcentagemNaoProducao[j]);
-		}
-		System.out.println("-------------------------------------------------------------------------------------------------------------------------------------------------");
-	}
-
-	// Funçào imprimirCabecalho() que imprime o cabecalho da tabela
-	public static void imprimirCabecalho() {
-		System.out.printf("%-8s %-20s %-15s %-12s %-12s %-12s %-15s %-15s\n", 
-        "Codigo", "Fabrica", "Prod. Maxima", "Prod. Mes 1", "Prod. Mes 2", "Prod. Mes 3", "Media Producao", "% Nao Producao");
-		System.out.println("-------------------------------------------------------------------------------------------------------------------------------------------------");
-	}
-
-	// Função para imprimir os dados de uma fabrica especifica
-	public static void imprimirDadosUnico(int pos ,int[] codigos, String[] fabricas, int[] prodMaxima, int[] prodMes1, int[] prodMes2, int[] prodMes3, double[] producaoMedia, double[] porcentagemNaoProducao){
-		System.out.printf("%-8d %-20s %-15d %-12d %-12d %-12d %-15.2f %-15.2f\n", 
-        codigos[pos], fabricas[pos], prodMaxima[pos], prodMes1[pos], prodMes2[pos], prodMes3[pos], producaoMedia[pos], porcentagemNaoProducao[pos]);
-	}
-
 	// Função fabricaMaiorProducao() que procura a fabrica com maior capacidade de producao de um produto
-	public static int fabricaMaiorProducao(int codInput ,int[] codigos, String[] fabricas, int[] prodMaxima, int[] prodMes1, int[] prodMes2, int[] prodMes3, double[] producaoMedia, double[] porcentagemNaoProducao){
+	public static int fabricaMaiorProducao(int codInput , Produto[] produtos){
 		int pos = -1;
 		int maior = 0;
 		for (int i = 0; i < N; i++) {
-			if (codInput == codigos[i]) {
-				if (prodMaxima[i] > maior) {
-					maior = prodMaxima[i];
+			if (codInput == produtos[i].codigo) {
+				if (produtos[i].producaoMax > maior) {
+					maior = produtos[i].producaoMax;
 					pos = i;
 				}
 			}
@@ -67,11 +59,12 @@ public class Ache {
 		return pos;
 	}
 	// Busca a fabrica e retorna um vetor com os indices das fabricas que fabricam o produto e o número de elementos do vetor
-	public static int[] buscaPorFabrica(String fabInput, String[] fabricas) {
+	public static int[] buscaPorFabrica(String fabInput, Produto[] produtos) {
 		int[] indices = new int[1];
 		int cont = 0;
 		for (int i = 0; i < N; i++) {
-			if (fabricas[i].trim().equalsIgnoreCase(fabInput.trim())) {
+			String nome = produtos[i].nome.trim();
+			if (nome.equalsIgnoreCase(fabInput.trim())) {
 				// Verifica se o vetor precisa ser expandido
 				if (cont == indices.length) {
 					int[] novoIndices = new int[indices.length + 1];
@@ -85,11 +78,11 @@ public class Ache {
 		return indices;
 	}
 	// Função selecionaProdAbaixo() gera um vetor com os índices de vetor onde na tabela se encontra o percentual de produção abaixo da capacidade máxima da fábrica
-	public static int[] selecionaProdAbaixo(double porcLimiteInput, double[] porcentagemNaoProducao){
+	public static int[] selecionaProdAbaixo(double porcLimiteInput, Produto[] produtos){
 		int[] indices = new int[1];
 		int cont = 0;
 		for (int i = 0; i < N; i++) {
-			if (porcentagemNaoProducao[i] > porcLimiteInput) {
+			if (produtos[i].porcentagemNaoProducao > porcLimiteInput) {
 				// Verifica se o vetor precisa ser expandido
 				if (cont == indices.length) {
 					// Cria um novo vetor com o dobro do tamanho atual
@@ -113,13 +106,8 @@ public class Ache {
 		 * Declarar vetores usado no programa
 		 * As linhas com erros no codigo precisam desses vetores  
 		 */
-		// Vetores para armazenar os dados do arquivo CSV
-		int[] codigos = new int[N];
-		String[] fabricas = new String[N];
-		int[] prodMaxima = new int[N];
-		int[] prodMes1 = new int[N];
-		int[] prodMes2 = new int[N];
-		int[] prodMes3 = new int[N];
+		// Vetor produtos para armazenar os dados do arquivo CSV
+		Produto produtos[] = new Produto[N];
 
 		try {
 			// Cria um objeto File com o caminho do arquivo
@@ -129,18 +117,23 @@ public class Ache {
                             Scanner leArq = new Scanner(arquivo)) {
                         int i = 0;
                         while (leArq.hasNextLine() && i < N) {
+							Produto produto = new Produto();
                             // Le uma linha do arquivo
                             String linha = leArq.nextLine();
                             //separa em Strings cada parte separada por ";"
                             String[] partes = linha.split(";");
                             // atribui a cada vetor declarado anteriormente as partes separadas
                             // fazendo conversao de String para int quando necessario
-                            codigos[i] = Integer.parseInt(partes[0]);
-                            fabricas[i] = partes[1];
-                            prodMaxima[i] = Integer.parseInt(partes[2]);
-                            prodMes1[i] = Integer.parseInt(partes[3]);
-                            prodMes2[i] = Integer.parseInt(partes[4]);
-                            prodMes3[i] = Integer.parseInt(partes[5]);
+                            produto.codigo = Integer.parseInt(partes[0]);
+                            produto.nome = partes[1];
+                            produto.producaoMax = Integer.parseInt(partes[2]);
+                            produto.producaoMes1 = Integer.parseInt(partes[3]);
+                            produto.producaoMes2 = Integer.parseInt(partes[4]);
+                            produto.producaoMes3 = Integer.parseInt(partes[5]);
+							produto.producaoMedia = produto.calcularMedia(produto.producaoMes1, produto.producaoMes2, produto.producaoMes3);
+							produto.porcentagemNaoProducao = produto.calcularPorcentagemNaoProducao(produto.producaoMedia, produto.producaoMax);
+							// armazenar produto
+							produtos[i] = produto;
                             i++;
                         }
                         // Fechar o objeto da classe Scanner le
@@ -149,20 +142,12 @@ public class Ache {
 			// Caso o arquivo n�o seja encontrado
 			System.out.println("Arquivo nao encontrado: " + e.getMessage());
 		}
-		
+		// Imprimir todos os dados
+		System.out.println(imprimirCabecalho());
+		for (Produto produto : produtos){
+			System.out.println(produto.formatarLinha());
+		}
 		try (Scanner le = new Scanner(System.in)) {
-			/*
-			 * Declara variaveis e vetores necessarios para item 2 do enunciado.
-			 * Chamar a funcao calculaMediaPorcentagemProducao() e apresentar os vetores por ela gerados
-			 */
-			double[] producaoMedia = new double[N];
-			double[] porcentagemNaoProducao = new double[N];
-			// Chama a funcao que calcula a media de producao e o percentual de nao producao
-			calculaMediaPorcentagemProducao(prodMes1, prodMes2, prodMes3, prodMaxima, producaoMedia, porcentagemNaoProducao);
-			// Apresenta os vetores gerados pela funcao
-			imprimirDados(codigos, fabricas, prodMaxima, prodMes1, prodMes2, prodMes3, producaoMedia, porcentagemNaoProducao);
-
-			
 			
 			int opcao;
 			
@@ -180,12 +165,12 @@ public class Ache {
                                     System.out.print("Qual o codigo do produto a ser pesquisado? ");
                                     int codProcurado = le.nextInt();
                                     // Chama a funcao que procura a fabrica com maior capacidade de producao de um produto
-                                    int pos = fabricaMaiorProducao(codProcurado, codigos, fabricas, prodMaxima, prodMes1, prodMes2, prodMes3, producaoMedia, porcentagemNaoProducao);
+                                    int pos = fabricaMaiorProducao(codProcurado, produtos);
                                     if (pos != -1) {
                                         System.out.println("Fabrica com maior capacidade de producao do produto " + codProcurado + ": ");
                                         // Chama a funcao que imprime os dados da fabrica
-                                        imprimirCabecalho();
-                                        imprimirDadosUnico(pos, codigos, fabricas, prodMaxima, prodMes1, prodMes2, prodMes3, producaoMedia, porcentagemNaoProducao);
+										System.out.println(imprimirCabecalho());
+										System.out.println(produtos[pos].formatarLinha());
                                     } else {
                                         System.out.println("Produto nao encontrado.");
                                     }
@@ -199,14 +184,15 @@ public class Ache {
                                     * Implementacao item 4
                                     */
                                     // Chama a funcao que busca os produtos fabricados em uma especifica unidade
-                                    int[] indices = buscaPorFabrica(fab, fabricas);
+                                    int[] indices = buscaPorFabrica(fab, produtos);
                                     int numeroDeElementos = indices.length;
                                     if (numeroDeElementos > 0) {
                                         System.out.println("Produtos fabricados na unidade " + fab + ": ");
                                         // Chama a funcao que imprime os dados da fabrica
-                                        imprimirCabecalho();
+										System.out.println(imprimirCabecalho());
                                         for (int j = 0; j < numeroDeElementos; j++) {
-                                            imprimirDadosUnico(indices[j], codigos, fabricas, prodMaxima, prodMes1, prodMes2, prodMes3, producaoMedia, porcentagemNaoProducao);
+											int indice = indices[j];
+											System.out.println(produtos[indice].formatarLinha());
                                         }
                                         System.out.println("-------------------------------------------------------------------------------------------------------------------------------------------------");
                                     } else {
@@ -220,14 +206,15 @@ public class Ache {
                                     * Implementacao item 5
                                     */
                                     // Chama a funcao que retorna os indices dos produtos com percentual de nao producao acima de um limite
-                                    int[] indicesProdAbaixo = selecionaProdAbaixo(porcLimite, porcentagemNaoProducao);
+                                    int[] indicesProdAbaixo = selecionaProdAbaixo(porcLimite, produtos);
                                     int numeroDeElementosProdAbaixo = indicesProdAbaixo.length;
                                     if (numeroDeElementosProdAbaixo > 0) {
-                                        System.out.println("Produtos com percentual de nao producao acima de " + porcLimite + "% 2: ");
+                                        System.out.println("Produtos com percentual de nao producao acima de " + porcLimite + "% : ");
                                         // Chama a funcao que imprime os dados da fabrica
-                                        imprimirCabecalho();
+                                        System.out.println(imprimirCabecalho());
                                         for (int j = 0; j < numeroDeElementosProdAbaixo; j++) {
-                                            imprimirDadosUnico(indicesProdAbaixo[j], codigos, fabricas, prodMaxima, prodMes1, prodMes2, prodMes3, producaoMedia, porcentagemNaoProducao);
+											int indice = indicesProdAbaixo[j];
+                                            System.out.println(produtos[indice].formatarLinha());
                                         }
                                         System.out.println("-------------------------------------------------------------------------------------------------------------------------------------------------");
                                     } else {
