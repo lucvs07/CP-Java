@@ -58,14 +58,22 @@ public class Ache {
 		}
 		return pos;
 	}
-	// Busca a fabrica e retorna um vetor com os indices das fabricas que fabricam o produto e o número de elementos do vetor
-	public static int[] buscaPorFabrica(String fabInput, Produto[] produtos) {
+	// Classe auxiliar para retornar vetor de índices e quantidade de elementos encontrados
+	public static class ResultadoBusca {
+		public int[] indices;
+		public int quantidade;
+		public ResultadoBusca(int[] indices, int quantidade) {
+			this.indices = indices;
+			this.quantidade = quantidade;
+		}
+	}
+	// Busca a fabrica e retorna um objeto com os indices das fabricas que fabricam o produto e o número de elementos encontrados
+	public static ResultadoBusca buscaPorFabrica(String fabInput, Produto[] produtos) {
 		int[] indices = new int[1];
 		int cont = 0;
 		for (int i = 0; i < N; i++) {
 			String nome = produtos[i].nome.trim();
 			if (nome.equalsIgnoreCase(fabInput.trim())) {
-				// Verifica se o vetor precisa ser expandido
 				if (cont == indices.length) {
 					int[] novoIndices = new int[indices.length + 1];
 					System.arraycopy(indices, 0, novoIndices, 0, indices.length);
@@ -75,17 +83,18 @@ public class Ache {
 				cont++;
 			}
 		}
-		return indices;
+		// Ajusta o tamanho do vetor para a quantidade encontrada
+		int[] resultado = new int[cont];
+		System.arraycopy(indices, 0, resultado, 0, cont);
+		return new ResultadoBusca(resultado, cont);
 	}
-	// Função selecionaProdAbaixo() gera um vetor com os índices de vetor onde na tabela se encontra o percentual de produção abaixo da capacidade máxima da fábrica
-	public static int[] selecionaProdAbaixo(double porcLimiteInput, Produto[] produtos){
+	// Função selecionaProdAbaixo() gera um objeto com os índices onde o percentual de produção está abaixo do limite
+	public static ResultadoBusca selecionaProdAbaixo(double porcLimiteInput, Produto[] produtos){
 		int[] indices = new int[1];
 		int cont = 0;
 		for (int i = 0; i < N; i++) {
 			if (produtos[i].porcentagemNaoProducao > porcLimiteInput) {
-				// Verifica se o vetor precisa ser expandido
 				if (cont == indices.length) {
-					// Cria um novo vetor com o dobro do tamanho atual
 					int[] novoIndices = new int[indices.length + 1];
 					System.arraycopy(indices, 0, novoIndices, 0, indices.length);
 					indices = novoIndices;
@@ -94,7 +103,9 @@ public class Ache {
 				cont++;
 			}
 		}
-		return indices;
+		int[] resultado = new int[cont];
+		System.arraycopy(indices, 0, resultado, 0, cont);
+		return new ResultadoBusca(resultado, cont);
 	}
 	public static void main(String[] args) {
 		// Obtem caminho da pasta workspace da IDE
@@ -176,51 +187,40 @@ public class Ache {
                                     }
                                 }
 				case 2 -> {
-                                    System.out.print("Fabrica para pesquisar produtos:");
-                                    // Le a fabrica a ser pesquisada
-                                    String fab = le.nextLine();
-                                    System.out.println(fab);
-                                    /*
-                                    * Implementacao item 4
-                                    */
-                                    // Chama a funcao que busca os produtos fabricados em uma especifica unidade
-                                    int[] indices = buscaPorFabrica(fab, produtos);
-                                    int numeroDeElementos = indices.length;
-                                    if (numeroDeElementos > 0) {
-                                        System.out.println("Produtos fabricados na unidade " + fab + ": ");
-                                        // Chama a funcao que imprime os dados da fabrica
-										System.out.println(imprimirCabecalho());
-                                        for (int j = 0; j < numeroDeElementos; j++) {
-											int indice = indices[j];
-											System.out.println(produtos[indice].formatarLinha());
-                                        }
-                                        System.out.println("-------------------------------------------------------------------------------------------------------------------------------------------------");
-                                    } else {
-                                        System.out.println("Fabrica nao encontrada.");
-                                    }
-                                }
+					System.out.print("Fabrica para pesquisar produtos:");
+					String fab = le.nextLine();
+					System.out.println(fab);
+					ResultadoBusca resultado = buscaPorFabrica(fab, produtos);
+					if (resultado.quantidade > 0) {
+						System.out.println("\nQuantidade de Produtos Encontrados : " + resultado.quantidade);
+						System.out.println("Produtos fabricados na unidade " + fab + ": ");
+						System.out.println(imprimirCabecalho());
+						for (int j = 0; j < resultado.quantidade; j++) {
+							int indice = resultado.indices[j];
+							System.out.println(produtos[indice].formatarLinha());
+						}
+						System.out.println("-------------------------------------------------------------------------------------------------------------------------------------------------");
+					} else {
+						System.out.println("Fabrica nao encontrada.");
+					}
+				}
 				case 3 -> {
-                                    System.out.print("Qual o valor limite de percentual nao produzido que se deseja pesquisar: ");
-                                    double porcLimite = le.nextDouble();
-                                    /*
-                                    * Implementacao item 5
-                                    */
-                                    // Chama a funcao que retorna os indices dos produtos com percentual de nao producao acima de um limite
-                                    int[] indicesProdAbaixo = selecionaProdAbaixo(porcLimite, produtos);
-                                    int numeroDeElementosProdAbaixo = indicesProdAbaixo.length;
-                                    if (numeroDeElementosProdAbaixo > 0) {
-                                        System.out.println("Produtos com percentual de nao producao acima de " + porcLimite + "% : ");
-                                        // Chama a funcao que imprime os dados da fabrica
-                                        System.out.println(imprimirCabecalho());
-                                        for (int j = 0; j < numeroDeElementosProdAbaixo; j++) {
-											int indice = indicesProdAbaixo[j];
-                                            System.out.println(produtos[indice].formatarLinha());
-                                        }
-                                        System.out.println("-------------------------------------------------------------------------------------------------------------------------------------------------");
-                                    } else {
-                                        System.out.println("Nenhum produto encontrado com percentual de nao producao acima de " + porcLimite + ".");
-                                    }
-                                }
+					System.out.print("Qual o valor limite de percentual nao produzido que se deseja pesquisar: ");
+					double porcLimite = le.nextDouble();
+					ResultadoBusca resultado = selecionaProdAbaixo(porcLimite, produtos);
+					if (resultado.quantidade > 0) {
+						System.out.println("\nQuantidade de Produtos Encontrados : " + resultado.quantidade);
+						System.out.println("Produtos com percentual de nao producao acima de " + porcLimite + "% : ");
+						System.out.println(imprimirCabecalho());
+						for (int j = 0; j < resultado.quantidade; j++) {
+							int indice = resultado.indices[j];
+							System.out.println(produtos[indice].formatarLinha());
+						}
+						System.out.println("-------------------------------------------------------------------------------------------------------------------------------------------------");
+					} else {
+						System.out.println("Nenhum produto encontrado com percentual de nao producao acima de " + porcLimite + ".");
+					}
+				}
 				default -> System.out.println("Opcao invalida");
 				}
 			} while (opcao != 0);
