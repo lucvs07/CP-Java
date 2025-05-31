@@ -58,54 +58,29 @@ public class Ache {
 		}
 		return pos;
 	}
-	// Classe auxiliar para retornar vetor de índices e quantidade de elementos encontrados
-	public static class ResultadoBusca {
-		public int[] indices;
-		public int quantidade;
-		public ResultadoBusca(int[] indices, int quantidade) {
-			this.indices = indices;
-			this.quantidade = quantidade;
-		}
-	}
+	
 	// Busca a fabrica e retorna um objeto com os indices das fabricas que fabricam o produto e o número de elementos encontrados
-	public static ResultadoBusca buscaPorFabrica(String fabInput, Produto[] produtos) {
-		int[] indices = new int[1];
+	public static int buscaPorFabrica(String fabInput, Produto[] produtos, int[] indices) {
 		int cont = 0;
 		for (int i = 0; i < N; i++) {
 			String nome = produtos[i].nome.trim();
 			if (nome.equalsIgnoreCase(fabInput.trim())) {
-				if (cont == indices.length) {
-					int[] novoIndices = new int[indices.length + 1];
-					System.arraycopy(indices, 0, novoIndices, 0, indices.length);
-					indices = novoIndices;
-				}
 				indices[cont] = i;
 				cont++;
 			}
 		}
-		// Ajusta o tamanho do vetor para a quantidade encontrada
-		int[] resultado = new int[cont];
-		System.arraycopy(indices, 0, resultado, 0, cont);
-		return new ResultadoBusca(resultado, cont);
+		return cont;
 	}
 	// Função selecionaProdAbaixo() gera um objeto com os índices onde o percentual de produção está abaixo do limite
-	public static ResultadoBusca selecionaProdAbaixo(double porcLimiteInput, Produto[] produtos){
-		int[] indices = new int[1];
+	public static int selecionaProdAbaixo(double porcLimiteInput, Produto[] produtos, int[] indices){
 		int cont = 0;
 		for (int i = 0; i < N; i++) {
 			if (produtos[i].porcentagemNaoProducao > porcLimiteInput) {
-				if (cont == indices.length) {
-					int[] novoIndices = new int[indices.length + 1];
-					System.arraycopy(indices, 0, novoIndices, 0, indices.length);
-					indices = novoIndices;
-				}
 				indices[cont] = i;
 				cont++;
 			}
 		}
-		int[] resultado = new int[cont];
-		System.arraycopy(indices, 0, resultado, 0, cont);
-		return new ResultadoBusca(resultado, cont);
+		return cont;
 	}
 	public static void main(String[] args) {
 		// Obtem caminho da pasta workspace da IDE
@@ -190,13 +165,15 @@ public class Ache {
 					System.out.print("Fabrica para pesquisar produtos:");
 					String fab = le.nextLine();
 					System.out.println(fab);
-					ResultadoBusca resultado = buscaPorFabrica(fab, produtos);
-					if (resultado.quantidade > 0) {
-						System.out.println("\nQuantidade de Produtos Encontrados : " + resultado.quantidade);
+					int elementosEncontradosBuscaPorFabrica;
+					int [] indiceDeElementosEncontradosBuscaPorFabrica = new int[N];
+					elementosEncontradosBuscaPorFabrica = buscaPorFabrica(fab, produtos, indiceDeElementosEncontradosBuscaPorFabrica);
+					if (elementosEncontradosBuscaPorFabrica > 0) {
+						System.out.println("\nQuantidade de Produtos Encontrados : " + elementosEncontradosBuscaPorFabrica);
 						System.out.println("Produtos fabricados na unidade " + fab + ": ");
 						System.out.println(imprimirCabecalho());
-						for (int j = 0; j < resultado.quantidade; j++) {
-							int indice = resultado.indices[j];
+						for (int j = 0; j < elementosEncontradosBuscaPorFabrica; j++) {
+							int indice = indiceDeElementosEncontradosBuscaPorFabrica[j];
 							System.out.println(produtos[indice].formatarLinha());
 						}
 						System.out.println("-------------------------------------------------------------------------------------------------------------------------------------------------");
@@ -207,13 +184,15 @@ public class Ache {
 				case 3 -> {
 					System.out.print("Qual o valor limite de percentual nao produzido que se deseja pesquisar: ");
 					double porcLimite = le.nextDouble();
-					ResultadoBusca resultado = selecionaProdAbaixo(porcLimite, produtos);
-					if (resultado.quantidade > 0) {
-						System.out.println("\nQuantidade de Produtos Encontrados : " + resultado.quantidade);
+					int elementosEncontradosSelecionaProdAbaixo;
+					int [] indiceDeElementosEncontradosSelecionaProdAbaixo = new int[N];
+					elementosEncontradosSelecionaProdAbaixo = selecionaProdAbaixo(porcLimite, produtos, indiceDeElementosEncontradosSelecionaProdAbaixo);
+					if (elementosEncontradosSelecionaProdAbaixo > 0) {
+						System.out.println("\nQuantidade de Produtos Encontrados : " + elementosEncontradosSelecionaProdAbaixo);
 						System.out.println("Produtos com percentual de nao producao acima de " + porcLimite + "% : ");
 						System.out.println(imprimirCabecalho());
-						for (int j = 0; j < resultado.quantidade; j++) {
-							int indice = resultado.indices[j];
+						for (int j = 0; j < elementosEncontradosSelecionaProdAbaixo; j++) {
+							int indice = indiceDeElementosEncontradosSelecionaProdAbaixo[j];
 							System.out.println(produtos[indice].formatarLinha());
 						}
 						System.out.println("-------------------------------------------------------------------------------------------------------------------------------------------------");
